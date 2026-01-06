@@ -1,0 +1,164 @@
+{
+  "generated_at": "2026-01-06T07:26:58.385375+00:00",
+  "total_errors": 1261,
+  "total_logs_by_month": {
+    "1": 5869187,
+    "2": 4809200,
+    "3": 4204270,
+    "4": 3659844,
+    "5": 2371683,
+    "6": 930051,
+    "7": 1002683,
+    "8": 1442112,
+    "9": 2124020,
+    "10": 958502,
+    "11": 876964,
+    "12": 251657
+  },
+  "monthly": [
+    {
+      "month": 1,
+      "errors": 55,
+      "distinct_types": 1,
+      "percentage": 0.0,
+      "top_types": [
+        [
+          "err",
+          55
+        ]
+      ]
+    },
+    {
+      "month": 2,
+      "errors": 70,
+      "distinct_types": 1,
+      "percentage": 0.0,
+      "top_types": [
+        [
+          "err",
+          70
+        ]
+      ]
+    },
+    {
+      "month": 3,
+      "errors": 54,
+      "distinct_types": 1,
+      "percentage": 0.0,
+      "top_types": [
+        [
+          "err",
+          54
+        ]
+      ]
+    },
+    {
+      "month": 4,
+      "errors": 66,
+      "distinct_types": 1,
+      "percentage": 0.0,
+      "top_types": [
+        [
+          "err",
+          66
+        ]
+      ]
+    },
+    {
+      "month": 5,
+      "errors": 65,
+      "distinct_types": 1,
+      "percentage": 0.0,
+      "top_types": [
+        [
+          "err",
+          65
+        ]
+      ]
+    },
+    {
+      "month": 6,
+      "errors": 85,
+      "distinct_types": 1,
+      "percentage": 0.01,
+      "top_types": [
+        [
+          "err",
+          85
+        ]
+      ]
+    },
+    {
+      "month": 7,
+      "errors": 155,
+      "distinct_types": 1,
+      "percentage": 0.02,
+      "top_types": [
+        [
+          "err",
+          155
+        ]
+      ]
+    },
+    {
+      "month": 8,
+      "errors": 195,
+      "distinct_types": 1,
+      "percentage": 0.01,
+      "top_types": [
+        [
+          "err",
+          195
+        ]
+      ]
+    },
+    {
+      "month": 9,
+      "errors": 150,
+      "distinct_types": 1,
+      "percentage": 0.01,
+      "top_types": [
+        [
+          "err",
+          150
+        ]
+      ]
+    },
+    {
+      "month": 10,
+      "errors": 160,
+      "distinct_types": 1,
+      "percentage": 0.02,
+      "top_types": [
+        [
+          "err",
+          160
+        ]
+      ]
+    },
+    {
+      "month": 11,
+      "errors": 138,
+      "distinct_types": 1,
+      "percentage": 0.02,
+      "top_types": [
+        [
+          "err",
+          138
+        ]
+      ]
+    },
+    {
+      "month": 12,
+      "errors": 68,
+      "distinct_types": 1,
+      "percentage": 0.03,
+      "top_types": [
+        [
+          "err",
+          68
+        ]
+      ]
+    }
+  ]
+}

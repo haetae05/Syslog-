@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syslog 장애 예측 시스템</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #0b1623;
+      --card: #132338;
+      --text: #e9f2ff;
+      --muted: #9fb4d3;
+      --accent: #4fc3f7;
+      --accent-2: #f48fb1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #132338 0, #0b1623 40%), #0b1623;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+    .container {
+      width: min(1100px, 100%);
+    }
+    h1 {
+      text-align: center;
+      margin: 0 0 24px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      padding: 20px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    canvas {
+      width: 100% !important;
+      height: 420px !important;
+    }
+    .footer {
+      margin-top: 16px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Syslog 장애 예측 시스템</h1>
+    <div class="card">
+      <div class="meta" id="meta"></div>
+      <canvas id="chart"></canvas>
+      <div class="footer">데이터 출처: syslog1년치 (3번째 컬럼에 err 포함 레코드)</div>
+    </div>
+  </div>
+
+  <script>
+    async function loadData() {
+      const res = await fetch('./stats.json', { cache: 'no-cache' });
+      if (!res.ok) throw new Error('stats.json 로드 실패');
+      return res.json();
+    }
+
+    function renderChart(data) {
+      const labels = data.monthly.map(m => `${String(m.month).padStart(2, '0')}월`);
+      const counts = data.monthly.map(m => m.errors);
+      const percentages = data.monthly.map(m => m.percentage);
+
+      const ctx = document.getElementById('chart');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: '장애 건수',
+              data: counts,
+              backgroundColor: 'rgba(79, 195, 247, 0.55)',
+              borderColor: 'rgba(79, 195, 247, 0.9)',
+              borderWidth: 1,
+              yAxisID: 'y',
+            },
+            {
+              type: 'line',
+              label: '비율 (%)',
+              data: percentages,
+              borderColor: 'rgba(244, 143, 177, 0.95)',
+              backgroundColor: 'rgba(244, 143, 177, 0.35)',
+              tension: 0.3,
+              yAxisID: 'y1',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#e9f2ff' }
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const label = ctx.dataset.label || '';
+                  const v = ctx.parsed.y;
+                  return ctx.dataset.type === 'line'
+                    ? `${label}: ${v}%`
+                    : `${label}: ${v.toLocaleString()}건`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#e9f2ff' },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y: {
+              position: 'left',
+              title: { display: true, text: '장애 건수', color: '#e9f2ff' },
+              ticks: { color: '#e9f2ff' },
+              grid: { color: 'rgba(255,255,255,0.07)' }
+            },
+            y1: {
+              position: 'right',
+              title: { display: true, text: '비율 (%)', color: '#e9f2ff' },
+              ticks: { color: '#e9f2ff', callback: (v) => `${v}%` },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    }
+
+    function renderMeta(data) {
+      const meta = document.getElementById('meta');
+      const gen = new Date(data.generated_at);
+      meta.textContent = `생성 시각(UTC): ${gen.toISOString().replace('T', ' ').replace('Z', ' UTC')} | 총 장애 건수: ${data.total_errors.toLocaleString()}건`;
+    }
+
+    (async () => {
+      try {
+        const data = await loadData();
+        renderMeta(data);
+        renderChart(data);
+      } catch (err) {
+        console.error(err);
+        alert('데이터를 불러오지 못했습니다. stats.json을 생성했는지 확인하세요.');
+      }
+    })();
+  </script>
+</body>
+</html>
